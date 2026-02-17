@@ -44,9 +44,9 @@ def main() -> None:
         return
 
     sorted_artifacts = sorted(list(artifacts))
+    print(f"\nFound {len(sorted_artifacts)} artifact(s)...")
 
     if args.mode == "dry-run":
-        print("\nFound artifacts:")
         for artifact in sorted_artifacts:
             print(f"  {artifact}")
 
