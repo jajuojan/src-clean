@@ -14,7 +14,7 @@ from scanner import Artifact, DotnetScanner, NodeScanner
 def main() -> None:
     """Main entry point for the tool."""
     parser = argparse.ArgumentParser(description="Detect and remove build artifacts.")
-    parser.add_argument("path", nargs="?", default=".", help="Directory to scan")
+    parser.add_argument("path", help="Directory to scan")
     parser.add_argument(
         "--mode",
         choices=["dry-run", "script", "delete"],
@@ -24,6 +24,10 @@ def main() -> None:
             "script (print rm commands to stdout), delete (remove files)"
         ),
     )
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     args = parser.parse_args()
     root_path = Path(args.path).resolve()

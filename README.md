@@ -32,7 +32,7 @@ python src_clean.py . --mode delete
 
 ### Arguments
 
-- `path`: (Optional) The directory to scan. Defaults to the current directory (`.`).
+- `path`: The directory to scan.
 - `--mode`: The action to take. Options: `dry-run` (default), `script`, `delete`.
 
 ## Requirements
