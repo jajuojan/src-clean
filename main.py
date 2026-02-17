@@ -1,17 +1,30 @@
-﻿import argparse
-import os
-import shutil
+﻿"""
+Artifact Cleaner: A tool to detect and remove build artifacts.
+"""
+
+import argparse
 from pathlib import Path
 from typing import Set
 from scanner import NodeScanner, DotnetScanner
+from remover import DirectRemover, ScriptRemover
 
 
-def main():
+def main() -> None:
+    """Main entry point for the tool."""
     parser = argparse.ArgumentParser(description="Detect and remove build artifacts.")
     parser.add_argument("path", nargs="?", default=".", help="Directory to scan")
-    parser.add_argument("--mode", choices=["dry-run", "script", "delete"], default="dry-run",
-                        help="Action to take: dry-run (list), script (output rm commands), delete (remove files)")
-    parser.add_argument("--output", default="clean.sh", help="Output file for script mode")
+    parser.add_argument(
+        "--mode",
+        choices=["dry-run", "script", "delete"],
+        default="dry-run",
+        help=(
+            "Action to take: dry-run (list), "
+            "script (output rm commands), delete (remove files)"
+        ),
+    )
+    parser.add_argument(
+        "--output", default="clean.sh", help="Output file for script mode"
+    )
 
     args = parser.parse_args()
     root_path = Path(args.path).resolve()
@@ -21,7 +34,7 @@ def main():
         return
 
     print(f"Scanning {root_path}...")
-    
+
     scanners = [NodeScanner(), DotnetScanner()]
     artifacts: Set[Path] = set()
     for scanner in scanners:
@@ -37,30 +50,14 @@ def main():
         print("\nFound artifacts:")
         for artifact in sorted_artifacts:
             print(f"  {artifact}")
-    
+
     elif args.mode == "script":
-        with open(args.output, "w") as f:
-            if os.name == 'nt':
-                 # For Windows, provide standard rm which works in git bash / wsl / etc.
-                 f.write("#!/bin/sh\n")
-            else:
-                 f.write("#!/bin/sh\n")
-            for artifact in sorted_artifacts:
-                f.write(f"rm -rf \"{artifact}\"\n")
-        print(f"\nCreated {args.output} with {len(sorted_artifacts)} commands.")
+        script_remover = ScriptRemover(args.output)
+        script_remover.remove(sorted_artifacts)
 
     elif args.mode == "delete":
-        print("\nDeleting artifacts...")
-        for artifact in sorted_artifacts:
-            try:
-                print(f"  Removing {artifact}...")
-                if artifact.is_dir():
-                    shutil.rmtree(artifact)
-                else:
-                    artifact.unlink()
-            except Exception as e:
-                print(f"  Error removing {artifact}: {e}")
-        print("Done.")
+        direct_remover = DirectRemover()
+        direct_remover.remove(sorted_artifacts)
 
 
 if __name__ == "__main__":
