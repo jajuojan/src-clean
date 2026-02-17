@@ -1,3 +1,7 @@
+"""
+Directly remove build artifacts from the filesystem.
+"""
+
 import shutil
 from pathlib import Path
 from typing import Iterable
@@ -16,6 +20,6 @@ class DirectRemover(BaseRemover):
                     shutil.rmtree(artifact)
                 else:
                     artifact.unlink()
-            except Exception as e:
+            except (OSError, PermissionError) as e:
                 print(f"  Error removing {artifact}: {e}")
         print("Done.")

@@ -1,3 +1,7 @@
+"""
+Scanner for .NET build artifacts.
+"""
+
 import os
 import subprocess
 from pathlib import Path
@@ -6,9 +10,11 @@ from .base_scanner import BaseScanner
 
 
 class DotnetScanner(BaseScanner):
+    """Scanner for .NET bin and obj folders."""
+
     def scan(self, root_path: Path) -> Set[Path]:
         artifacts: Set[Path] = set()
-        for root, dirs, files in os.walk(root_path):
+        for root, _, files in os.walk(root_path):
             current_path = Path(root)
             for file in files:
                 if file.endswith((".csproj", ".fsproj", ".vbproj")):
@@ -23,7 +29,7 @@ class DotnetScanner(BaseScanner):
                 ["dotnet", "msbuild", str(project_file), "-getProperty:BaseOutputPath"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
             base_output = result.stdout.strip()
             if base_output:
@@ -33,10 +39,15 @@ class DotnetScanner(BaseScanner):
 
             # Get BaseIntermediateOutputPath
             result = subprocess.run(
-                ["dotnet", "msbuild", str(project_file), "-getProperty:BaseIntermediateOutputPath"],
+                [
+                    "dotnet",
+                    "msbuild",
+                    str(project_file),
+                    "-getProperty:BaseIntermediateOutputPath",
+                ],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
             base_intermediate = result.stdout.strip()
             if base_intermediate:

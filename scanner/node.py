@@ -1,3 +1,7 @@
+"""
+Scanner for Node.js build artifacts.
+"""
+
 import os
 from pathlib import Path
 from typing import Set
@@ -5,9 +9,11 @@ from .base_scanner import BaseScanner
 
 
 class NodeScanner(BaseScanner):
+    """Scanner for node_modules folders."""
+
     def scan(self, root_path: Path) -> Set[Path]:
         artifacts: Set[Path] = set()
-        for root, dirs, files in os.walk(root_path):
+        for root, _, files in os.walk(root_path):
             current_path = Path(root)
             if "package.json" in files:
                 node_modules = current_path / "node_modules"

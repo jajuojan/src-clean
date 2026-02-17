@@ -1,3 +1,7 @@
+"""
+Generate a shell script to remove build artifacts.
+"""
+
 import os
 from pathlib import Path
 from typing import Iterable
