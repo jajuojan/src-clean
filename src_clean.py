@@ -70,16 +70,19 @@ def main() -> None:
     scanners = [scanner_map[s]() for s in selected_scanners]
     artifacts: Set[Artifact] = set()
 
-    print(f"Scanning {root_path}...")
+    if args.mode != "script":
+        print(f"Scanning {root_path}...")
+
     for scanner in scanners:
         artifacts.update(scanner.scan(root_path, calculate_size=not args.no_size))
 
-    if not artifacts:
+    if not artifacts and args.mode != "script":
         print("No artifacts found.")
         return
 
     sorted_artifacts = sorted(list(artifacts), key=lambda x: x.path)
-    print(f"\nFound {len(sorted_artifacts)} artifact(s)...")
+    if args.mode != "script":
+        print(f"\nFound {len(sorted_artifacts)} artifact(s)...")
 
     if args.mode == "dry-run":
         total_size = 0

@@ -10,7 +10,7 @@ A Python tool to detect and remove build artifacts for Node.js and .NET projects
 - **Disk Space Analysis**: Calculates and displays the size of each artifact and total potential savings.
 - **Multiple Deletion Modes**:
   - **Dry Run** (default): Safely list all detected artifacts and their sizes.
-  - **Script Generation**: Generate a POSIX-compliant shell script to stdout for manual execution.
+  - **Script Generation**: Print only `rm -rf` lines to stdout for manual execution (add a shebang yourself if needed).
   - **Direct Deletion**: Interactive removal with confirmation prompts and a final report of space freed.
 - **Selective Scanning**: Choose specific scanners or run all of them at once.
 
