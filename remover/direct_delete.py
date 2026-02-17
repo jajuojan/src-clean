@@ -16,6 +16,11 @@ class DirectRemover(BaseRemover):
         print("\nDeleting artifacts...")
         for artifact in artifacts:
             try:
+                response = input(f"  Remove {artifact}? [y/N] ").lower().strip()
+                if response != "y":
+                    print(f"  Skipping {artifact}...")
+                    continue
+
                 print(f"  Removing {artifact}...")
                 if artifact.is_dir():
                     shutil.rmtree(artifact)
@@ -23,4 +28,6 @@ class DirectRemover(BaseRemover):
                     artifact.unlink()
             except (OSError, PermissionError) as e:
                 print(f"  Error removing {artifact}: {e}")
-        print("Done.")
+            except EOFError:
+                print("\nInterrupted.")
+                break
