@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from scanner.node import NodeScanner
+from scanner.base_scanner import Artifact
 
 
 class TestNodeScanner(unittest.TestCase):
@@ -32,7 +33,7 @@ class TestNodeScanner(unittest.TestCase):
         artifacts = self.scanner.scan(self.test_dir)
 
         self.assertEqual(len(artifacts), 1)
-        self.assertIn(node_modules, artifacts)
+        self.assertIn(Artifact(path=node_modules, type="Node.js"), artifacts)
 
     def test_scan_ignores_node_modules_without_package_json(self) -> None:
         """Test that scan ignores node_modules if no package.json is present."""
@@ -64,8 +65,8 @@ class TestNodeScanner(unittest.TestCase):
         artifacts = self.scanner.scan(self.test_dir)
 
         self.assertEqual(len(artifacts), 2)
-        self.assertIn(n1, artifacts)
-        self.assertIn(n2, artifacts)
+        self.assertIn(Artifact(path=n1, type="Node.js"), artifacts)
+        self.assertIn(Artifact(path=n2, type="Node.js"), artifacts)
 
 
 if __name__ == "__main__":

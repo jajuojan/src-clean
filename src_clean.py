@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Set
 
 from remover import DirectRemover, ScriptRemover
-from scanner import DotnetScanner, NodeScanner
+from scanner import Artifact, DotnetScanner, NodeScanner
 
 
 def main() -> None:
@@ -35,7 +35,7 @@ def main() -> None:
     print(f"Scanning {root_path}...")
 
     scanners = [NodeScanner(), DotnetScanner()]
-    artifacts: Set[Path] = set()
+    artifacts: Set[Artifact] = set()
     for scanner in scanners:
         artifacts.update(scanner.scan(root_path))
 
@@ -43,20 +43,20 @@ def main() -> None:
         print("No artifacts found.")
         return
 
-    sorted_artifacts = sorted(list(artifacts))
+    sorted_artifacts = sorted(list(artifacts), key=lambda x: x.path)
     print(f"\nFound {len(sorted_artifacts)} artifact(s)...")
 
     if args.mode == "dry-run":
         for artifact in sorted_artifacts:
-            print(f"  {artifact}")
+            print(f"  {artifact.path} [{artifact.type}]")
 
     elif args.mode == "script":
         script_remover = ScriptRemover()
-        script_remover.remove(sorted_artifacts)
+        script_remover.remove([a.path for a in sorted_artifacts])
 
     elif args.mode == "delete":
         direct_remover = DirectRemover()
-        result = direct_remover.remove(sorted_artifacts)
+        result = direct_remover.remove([a.path for a in sorted_artifacts])
         if not result.success:
             sys.exit(1)
 

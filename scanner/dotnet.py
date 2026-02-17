@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 from typing import Set
 
-from .base_scanner import BaseScanner
+from .base_scanner import Artifact, BaseScanner
 
 
 class DotnetScanner(BaseScanner):
@@ -29,12 +29,12 @@ class DotnetScanner(BaseScanner):
         except (subprocess.CalledProcessError, FileNotFoundError):
             return False
 
-    def scan(self, root_path: Path) -> Set[Path]:
+    def scan(self, root_path: Path) -> Set[Artifact]:
         """Scan for build artifacts in the given root path."""
         if not self._is_available:
             return set()
 
-        artifacts: Set[Path] = set()
+        artifacts: Set[Artifact] = set()
         for root, _, files in os.walk(root_path):
             current_path = Path(root)
             for file in files:
@@ -42,8 +42,8 @@ class DotnetScanner(BaseScanner):
                     artifacts.update(self._scan_dotnet(current_path / file))
         return artifacts
 
-    def _scan_dotnet(self, project_file: Path) -> Set[Path]:
-        artifacts: Set[Path] = set()
+    def _scan_dotnet(self, project_file: Path) -> Set[Artifact]:
+        artifacts: Set[Artifact] = set()
 
         # Get both BaseOutputPath and BaseIntermediateOutputPath in a single call
         result = subprocess.run(
@@ -67,6 +67,6 @@ class DotnetScanner(BaseScanner):
             if val:
                 path = (project_file.parent / val).resolve()
                 if path.exists() and path.is_dir():
-                    artifacts.add(path)
+                    artifacts.add(Artifact(path=path, type=".NET"))
 
         return artifacts
